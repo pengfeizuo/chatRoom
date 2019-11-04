@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+		<title>聊天室2</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			
+			body {
+				font: 13px Helvetica, Arial;
+			}
+			
+			form {
+				background: #000;
+				padding: 3px;
+				position: fixed;
+				bottom: 0;
+				width: 100%;
+			}
+			
+			form input {
+				border: 0;
+				height: 35px;
+				width: calc(84% - 3px);
+				margin-right: 3px;
+				text-indent: 10px;
+			}
+			
+			form button {
+				height: 35px;
+				line-height: 35px;
+				width: 16%;
+				background: rgb(130, 224, 255);
+				border: none;
+			}
+			
+			#messages {
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+			
+			#messages li {
+				padding: 10px 10px;
+				line-height: 24px;
+			}
+			
+			#messages li:nth-child(odd) {
+				background: #eee;
+			}
+		</style>
+		<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+	</head>
+
+	<body>
+		<ul id="messages"></ul>
+		<form action="">
+			<input id="m" autocomplete="off" /><button>发送</button>
+		</form>
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+			var name = prompt("请输入你的昵称：");
+			var socket = io()
+			//发送昵称给后端
+			socket.emit("join", name)
+//			document.title = name + "的群聊" //new addition	
+			//收到服务器发来的join事件时
+			socket.on("join", function(user) {
+				addLine(user + " 加入了群聊")
+			})
+			//接收到服务器发来的message事件
+			socket.on("message", function(msg) {
+			  addLine(msg)
+			})
+			function addLine(msg) {
+				$('#messages').append($('<li>').html(msg));
+			}
+			$('form').submit(function () {
+			    //solve code
+//			    socket.emit("join", name)
+			    var msg = $("#m").val()
+			    socket.emit("message", msg) //将消息发送给服务器
+			    $("#m").val("") //置空消息框
+			    return false //阻止form提交
+			    
+			})
+		</script>
+	</body>
+
+</html>

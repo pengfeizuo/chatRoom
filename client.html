@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>WebSocket 聊天室</title>
+		<style type="text/css">
+			.room{
+				overflow-y: auto;
+				width: 500px; height: 300px;border: 1px solid #333;padding: 20px;line-height: 30px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<script type="text/javascript">
+			var socket;
+			if(!window.WebSocket) {
+				window.WebSocket = window.MozWebSocket;
+			}
+			if(window.WebSocket) {
+				socket = new WebSocket("ws://localhost:8080/ws");
+				socket.onmessage = function(event) {
+					var ta = document.getElementById('responseText');
+					ta.innerHTML = ta.innerHTML + '\n' + event.data +'<br>'
+				};
+				socket.onopen = function(event) {
+					var ta = document.getElementById('responseText');
+					ta.innerHTML = "连接开启!" +'<br>';
+				};
+				socket.onclose = function(event) {
+					var ta = document.getElementById('responseText');
+					ta.innerHTML = ta.value + "连接被关闭" +'<br>';
+				};
+			} else {
+				alert("你的浏览器不支持 WebSocket！");
+			}
+
+			function send(message) {
+				if(!window.WebSocket) {
+					return;
+				}
+				if(socket.readyState == WebSocket.OPEN) {
+					socket.send(message);
+				} else {
+					alert("连接没有开启.");
+				}
+			}
+		</script>
+		<form onsubmit="return false;">
+			<h3>WebSocket 聊天室：</h3>
+			<div id="responseText" class="room" style=""></div>
+			<br>
+			<input type="text" name="message" style="width: 300px" value="">
+			<input type="button" value="发送消息" onclick="send(this.form.message.value)">
+			<input type="button" onclick="javascript:document.getElementById('responseText').innerHTML=''" value="清空聊天记录">
+		</form>
+		<br>
+		<br>
+	</body>
+
+</html>
